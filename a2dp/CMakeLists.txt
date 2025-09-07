@@ -1,4 +1,4 @@
-add_library(a2dp STATIC a2dp_sink.c a2dp_cover_art.c)
+add_library(a2dp STATIC a2dp_sink.c)
 
 target_include_directories(a2dp PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
