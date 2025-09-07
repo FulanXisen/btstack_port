@@ -5,7 +5,7 @@ if(APPLE)
     SET(BTSTACK_ROOT "/Users/fanyx/toys/btstack_v1.6.2")
 endif()
 
-if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+if(LINUX)
     message(STATUS "Building on Linux!")
     SET(BTSTACK_ROOT "/home/admin/toys/btstack")
 endif()
