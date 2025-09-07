@@ -279,6 +279,7 @@ add_subdirectory(hci)
 # --------------------------
 # 示例程序源码（根据实际文件调整）
 set(DEMO_SOURCES
+    ${DEMO_ROOT}/btstack_global.c
     ${DEMO_ROOT}/btstack_main.c  
     ${DEMO_ROOT}/main.c          
 )
