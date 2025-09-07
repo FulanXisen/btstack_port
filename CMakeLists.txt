@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.12)
-project(BTstack-libusb)
+project(BTstack-port)
 
 # --------------------------
 # 基础配置
@@ -10,7 +10,7 @@ SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # 路径配置（核心！请根据实际环境修改）
 # BTSTACK_ROOT: BTStack源码根目录
 # DEMO_ROOT: 当前示例程序所在目录（无需修改）
-SET(BTSTACK_ROOT "/home/admin/toys/btstack")
+SET(BTSTACK_ROOT "/Users/fanyx/toys/btstack_v1.6.2")
 SET(DEMO_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 
 
@@ -18,6 +18,7 @@ SET(DEMO_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 # 编译器配置
 # --------------------------
 # 根据不同编译器设置警告级别（与BTStack官方保持一致）
+message("CMAKE_C_COMPILER_ID: ${CMAKE_C_COMPILER_ID}")
 if("${CMAKE_C_COMPILER_ID}" MATCHES ".*Clang.*")
     # Clang编译器警告配置
     SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wunused-variable -Wswitch-default -Wall -Wextra -Werror -Werror=uninitialized")
@@ -232,7 +233,7 @@ set(SOURCES_BTSTACK
     ${SOURCES_ZEPHYR}
 )
 list(SORT SOURCES_BTSTACK)
-
+message("SOURCES_BTSTACK: ${SOURCES_BTSTACK}")
 # 生成BTStack静态库（先编译库再链接，与官方保持一致）
 add_library(btstack STATIC ${SOURCES_BTSTACK})
 
@@ -268,26 +269,35 @@ target_link_libraries(btstack ${CMAKE_THREAD_LIBS_INIT})
 # 4. 数学库（BTStack内部计算依赖）
 target_link_libraries(btstack m)
 
+    
+add_subdirectory(a2dp)
+add_subdirectory(avrcp)
+add_subdirectory(hci)
 
 # --------------------------
 # 构建A2DP Sink示例程序
 # --------------------------
 # 示例程序源码（根据实际文件调整）
 set(DEMO_SOURCES
-    ${DEMO_ROOT}/a2dp_sink_demo.c  # A2DP Sink核心逻辑
-    ${DEMO_ROOT}/main.c            # 程序入口（若a2dp_sink_demo.c已有main，请删除此行）
+    ${DEMO_ROOT}/btstack_main.c  
+    ${DEMO_ROOT}/main.c          
 )
 
 # 生成可执行文件
-add_executable(a2dp_sink_demo ${DEMO_SOURCES})
+add_executable(btstack_port ${DEMO_SOURCES})
 
 # 链接BTStack静态库和所有依赖
-target_link_libraries(a2dp_sink_demo btstack)
+target_link_libraries(btstack_port 
+    btstack
+    a2dp
+    avrcp
+    hci
+    )
 
 # 示例程序编译宏定义（核心功能开关）
-target_compile_definitions(a2dp_sink_demo PRIVATE
+target_compile_definitions(btstack_port PRIVATE
     HAVE_BTSTACK_CONFIG_H  # 使用当前目录的btstack_config.h配置文件
     PLATFORM_LINUX         # 声明运行在Linux平台
     ENABLE_SBC_DECODER     # 启用SBC音频解码（A2DP必需）
 )
-    
+
