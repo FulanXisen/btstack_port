@@ -11,10 +11,10 @@ void a2dp_sink_demo_cover_art_packet_handler(uint8_t packet_type,
   uint16_t cid;
   switch (packet_type) {
   case BIP_DATA_PACKET:
-    if (a2dp_sink_cover_art_download_active) {
-      a2dp_sink_cover_art_file_size += size;
+    if (get_cover_art_download_status()) {
+      set_cover_art_file_size(get_cover_art_file_size() + size);
 #ifdef HAVE_POSIX_FILE_IO
-      fwrite(packet, 1, size, a2dp_sink_cover_art_file);
+      fwrite(packet, 1, size, get_cover_art_file());
 #else
       printf("Cover art       : TODO - store %u bytes image data\n", size);
 #endif
@@ -47,13 +47,13 @@ void a2dp_sink_demo_cover_art_packet_handler(uint8_t packet_type,
         }
         break;
       case AVRCP_SUBEVENT_COVER_ART_OPERATION_COMPLETE:
-        if (a2dp_sink_cover_art_download_active) {
-          a2dp_sink_cover_art_download_active = false;
+        if (get_cover_art_download_status()) {
+          set_cover_art_download_status(false);
 #ifdef HAVE_POSIX_FILE_IO
           printf("Cover Art       : download of '%s complete, size %u bytes'\n",
-                 a2dp_sink_demo_thumbnail_path, a2dp_sink_cover_art_file_size);
-          fclose(a2dp_sink_cover_art_file);
-          a2dp_sink_cover_art_file = NULL;
+                 get_thumbnail_path(), get_cover_art_file_size());
+          fclose(get_cover_art_file());
+          set_cover_art_file(NULL);
 #else
           printf("Cover Art: download completed\n");
 #endif
@@ -83,8 +83,8 @@ uint8_t a2dp_sink_demo_cover_art_connect(void) {
   uint8_t status;
   status = avrcp_cover_art_client_connect(
       get_a2dp_sink_cover_art_client(), a2dp_sink_demo_cover_art_packet_handler,
-      *get_device_addr(), a2dp_sink_demo_ertm_buffer,
-      sizeof(a2dp_sink_demo_ertm_buffer), &a2dp_sink_demo_ertm_config,
+      *get_device_addr(), *get_a2dp_sink_ertm_buffer(),
+      sizeof(*get_a2dp_sink_ertm_buffer()), get_a2dp_sink_ertm_config(),
       get_a2dp_sink_cover_art_cid_ptr());
   return status;
 }

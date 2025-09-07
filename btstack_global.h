@@ -8,6 +8,7 @@
 #include "btstack_resample.h"
 #include "classic/avrcp.h"
 #include "classic/avrcp_cover_art_client.h"
+#include "l2cap.h"
 #include "sbc_types.h"
 #include <stdio.h>
 #ifdef HAVE_POSIX_FILE_IO
@@ -21,6 +22,15 @@
 #ifdef HAVE_BTSTACK_STDIN
 #include "btstack_stdin.h"
 #endif
+
+// ring buffer for SBC Frames
+// below 30: add samples, 30-40: fine, above 40: drop samples
+#define OPTIMAL_FRAMES_MIN 60
+#define OPTIMAL_FRAMES_MAX 80
+#define ADDITIONAL_FRAMES  30
+#define NUM_CHANNELS 2
+#define BYTES_PER_FRAME     (2*NUM_CHANNELS)
+#define MAX_SBC_FRAME_SIZE 120
 
 #ifdef HAVE_BTSTACK_STDIN
 const char *get_device_addr_string();
@@ -43,6 +53,9 @@ uint8_t (*get_sdp_device_id_service_buffer())[100];
 
 
 
+#ifdef STORE_TO_WAV_FILE
+const char *get_wav_filename();
+#endif
 
 #ifdef ENABLE_AVRCP_COVER_ART
 char (*get_a2dp_sink_image_handle())[8];
@@ -54,61 +67,24 @@ uint16_t get_a2dp_sink_cover_art_cid();
 void set_a2dp_sink_cover_art_cid(uint16_t cid);
 uint16_t *get_a2dp_sink_cover_art_cid_ptr();
 
-uint8_t a2dp_sink_demo_ertm_buffer[2000];
-l2cap_ertm_config_t a2dp_sink_demo_ertm_config = {
-        1,  // ertm mandatory
-        2,  // max transmit, some tests require > 1
-        2000,
-        12000,
-        512,    // l2cap ertm mtu
-        2,
-        2,
-        1,      // 16-bit FCS
-};
-bool a2dp_sink_cover_art_download_active;
-uint32_t a2dp_sink_cover_art_file_size;
+uint8_t (*get_a2dp_sink_ertm_buffer())[2000]; 
+l2cap_ertm_config_t *get_a2dp_sink_ertm_config();
+
+// True for active, False for inactive
+bool get_cover_art_download_status();
+void set_cover_art_download_status(bool status);
+uint32_t get_cover_art_file_size();
+void set_cover_art_file_size(uint32_t size);
+
+
 #ifdef HAVE_POSIX_FILE_IO
-const char * a2dp_sink_demo_thumbnail_path = "cover.jpg";
-FILE * a2dp_sink_cover_art_file;
+const char *get_thumbnail_path();
+FILE *get_cover_art_file();
+void set_cover_art_file(FILE *file);
+
 #endif
 #endif
 
-// WAV File
-#ifdef STORE_TO_WAV_FILE
-uint32_t audio_frame_count = 0;
-char * wav_filename = "a2dp_sink_demo.wav";
-#endif
 
-// SBC Decoder for WAV file or live playback
-const btstack_sbc_decoder_t *   sbc_decoder_instance;
-btstack_sbc_decoder_bluedroid_t sbc_decoder_context;
-// ring buffer for SBC Frames
-// below 30: add samples, 30-40: fine, above 40: drop samples
-#define OPTIMAL_FRAMES_MIN 60
-#define OPTIMAL_FRAMES_MAX 80
-#define ADDITIONAL_FRAMES  30
-#define NUM_CHANNELS 2
-#define BYTES_PER_FRAME     (2*NUM_CHANNELS)
-#define MAX_SBC_FRAME_SIZE 120
-unsigned int sbc_frame_size;
-btstack_ring_buffer_t sbc_frame_ring_buffer;
-btstack_resample_t resample_instance;
-int media_initialized = 0;
-int audio_stream_started;
-btstack_ring_buffer_t decoded_audio_ring_buffer;
-// temp storage of lower-layer request for audio samples
-int16_t * request_buffer;
-int       request_frames;
-uint8_t sbc_frame_storage[(OPTIMAL_FRAMES_MAX + ADDITIONAL_FRAMES) * MAX_SBC_FRAME_SIZE];
-uint8_t decoded_audio_storage[(128+16) * BYTES_PER_FRAME];
 
-#ifdef HAVE_BTSTACK_AUDIO_EFFECTIVE_SAMPLERATE
-#include "btstack_sample_rate_compensation.h"
-#endif
-#ifdef HAVE_BTSTACK_AUDIO_EFFECTIVE_SAMPLERATE
-int l2cap_stream_started;
-#endif
-#ifdef HAVE_BTSTACK_AUDIO_EFFECTIVE_SAMPLERATE
-btstack_sample_rate_compensation_t sample_rate_compensation;
-#endif
-#endif
+#endif // __BTSTACK_GLOBAL_H__

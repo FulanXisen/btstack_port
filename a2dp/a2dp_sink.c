@@ -69,6 +69,35 @@
  * file if STORE_TO_WAV_FILE is defined, and/or played using the audio library.
  */
 
+ // WAV File
+#ifdef STORE_TO_WAV_FILE
+uint32_t audio_frame_count = 0;
+#endif
+
+
+
+// SBC Decoder for WAV file or live playback
+const btstack_sbc_decoder_t *   sbc_decoder_instance;
+btstack_sbc_decoder_bluedroid_t sbc_decoder_context;
+
+unsigned int sbc_frame_size;
+btstack_ring_buffer_t sbc_frame_ring_buffer;
+btstack_resample_t resample_instance;
+int media_initialized = 0;
+int audio_stream_started;
+btstack_ring_buffer_t decoded_audio_ring_buffer;
+// temp storage of lower-layer request for audio samples
+int16_t * request_buffer;
+int       request_frames;
+uint8_t sbc_frame_storage[(OPTIMAL_FRAMES_MAX + ADDITIONAL_FRAMES) * MAX_SBC_FRAME_SIZE];
+uint8_t decoded_audio_storage[(128+16) * BYTES_PER_FRAME];
+
+#ifdef HAVE_BTSTACK_AUDIO_EFFECTIVE_SAMPLERATE
+#include "btstack_sample_rate_compensation.h"
+int l2cap_stream_started;
+btstack_sample_rate_compensation_t sample_rate_compensation;
+#endif
+
 static void playback_handler(int16_t *buffer, uint16_t num_audio_frames);
 
 // media processing
@@ -412,7 +441,7 @@ media_processing_init(media_codec_configuration_sbc_t *configuration) {
                                   handle_pcm_data, NULL);
 
 #ifdef STORE_TO_WAV_FILE
-  wav_writer_open(wav_filename, configuration->num_channels,
+  wav_writer_open(get_wav_filename(), configuration->num_channels,
                   configuration->sampling_frequency);
 #endif
 
@@ -491,7 +520,7 @@ static void media_processing_close(void) {
          total_frames_nr, sbc_decoder_context.good_frames_nr,
          total_frames_nr - sbc_decoder_context.good_frames_nr);
   printf("WAV Writer: Wrote %u audio frames to wav file: %s\n",
-         audio_frame_count, wav_filename);
+         audio_frame_count, get_wav_filename());
 #endif
 
   // stop audio playback

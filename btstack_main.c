@@ -259,10 +259,10 @@ static void stdin_process(char cmd){
         case '@':
             printf("Get linked thumbnail for '%s'\n", (*get_a2dp_sink_image_handle()));
 #ifdef HAVE_POSIX_FILE_IO
-            a2dp_sink_cover_art_file = fopen(a2dp_sink_demo_thumbnail_path, "w");
+            set_cover_art_file(fopen(get_thumbnail_path(), "w"));
 #endif
-            a2dp_sink_cover_art_download_active = true;
-            a2dp_sink_cover_art_file_size = 0;
+            set_cover_art_download_status(true);
+            set_cover_art_file_size(0);
             status = avrcp_cover_art_client_get_linked_thumbnail(get_a2dp_sink_cover_art_cid(), (*get_a2dp_sink_image_handle()));
             break;
 #endif
@@ -387,7 +387,7 @@ int btstack_setup(){
         printf("Audio playback supported.\n");
     }
 #ifdef STORE_TO_WAV_FILE 
-   printf("Audio will be stored to \'%s\' file.\n",  wav_filename);
+   printf("Audio will be stored to \'%s\' file.\n",  get_wav_filename());
 #endif
 #endif
     return 0;
