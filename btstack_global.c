@@ -26,22 +26,20 @@ static uint16_t a2dp_sink_demo_cover_art_cid;
 
 static uint8_t a2dp_sink_demo_ertm_buffer[2000];
 static l2cap_ertm_config_t a2dp_sink_demo_ertm_config = {
-        1,  // ertm mandatory
-        2,  // max transmit, some tests require > 1
-        2000,
-        12000,
-        512,    // l2cap ertm mtu
-        2,
-        2,
-        1,      // 16-bit FCS
+    1, // ertm mandatory
+    2, // max transmit, some tests require > 1
+    2000, 12000,
+    512, // l2cap ertm mtu
+    2,    2,
+    1, // 16-bit FCS
 };
 
 static bool a2dp_sink_cover_art_download_active;
 static uint32_t a2dp_sink_cover_art_file_size;
 
-const char * a2dp_sink_demo_thumbnail_path = "cover.jpg";
-FILE * a2dp_sink_cover_art_file;
-char * wav_filename = "a2dp_sink_demo.wav";
+const char *a2dp_sink_demo_thumbnail_path = "cover.jpg";
+FILE *a2dp_sink_cover_art_file;
+char *wav_filename = "a2dp_sink_demo.wav";
 
 const char *get_device_addr_string() { return device_addr_string; }
 bd_addr_t *get_device_addr() { return &device_addr; }
@@ -76,9 +74,7 @@ uint8_t (*get_sdp_device_id_service_buffer())[100] {
   return &sdp_device_id_service_buffer;
 }
 
-char (*get_a2dp_sink_image_handle())[8] {
-  return &a2dp_sink_demo_image_handle;
-}
+char (*get_a2dp_sink_image_handle())[8] { return &a2dp_sink_demo_image_handle; }
 
 avrcp_cover_art_client_t *get_a2dp_sink_cover_art_client() {
   return &a2dp_sink_demo_cover_art_client;
@@ -89,11 +85,12 @@ bool get_a2dp_sink_cover_art_client_connected() {
 void set_a2dp_sink_cover_art_client_connected(bool connected) {
   a2dp_sink_demo_cover_art_client_connected = connected;
 }
-uint16_t get_a2dp_sink_cover_art_cid() {
-  return a2dp_sink_demo_cover_art_cid;
-}
+uint16_t get_a2dp_sink_cover_art_cid() { return a2dp_sink_demo_cover_art_cid; }
 void set_a2dp_sink_cover_art_cid(uint16_t cid) {
   a2dp_sink_demo_cover_art_cid = cid;
+}
+uint16_t *get_a2dp_sink_cover_art_cid_ptr() {
+  return &a2dp_sink_demo_cover_art_cid;
 }
 
 uint8_t (*get_a2dp_sink_ertm_buffer())[2000] {
@@ -109,24 +106,14 @@ bool get_cover_art_download_status() {
 void set_cover_art_download_status(bool status) {
   a2dp_sink_cover_art_download_active = status;
 }
-uint32_t get_cover_art_file_size() {
-  return a2dp_sink_cover_art_file_size;
-}
+uint32_t get_cover_art_file_size() { return a2dp_sink_cover_art_file_size; }
 void set_cover_art_file_size(uint32_t size) {
   a2dp_sink_cover_art_file_size = size;
 }
 
-const char *get_thumbnail_path() {
-  return a2dp_sink_demo_thumbnail_path;
-}
-FILE *get_cover_art_file() {
-  return a2dp_sink_cover_art_file;
-}
+const char *get_thumbnail_path() { return a2dp_sink_demo_thumbnail_path; }
+FILE *get_cover_art_file() { return a2dp_sink_cover_art_file; }
 
-void set_cover_art_file(FILE *file) {
-  a2dp_sink_cover_art_file = file;
-}
+void set_cover_art_file(FILE *file) { a2dp_sink_cover_art_file = file; }
 
-const char *get_wav_filename() {
-  return wav_filename;
-}
+const char *get_wav_filename() { return wav_filename; }
