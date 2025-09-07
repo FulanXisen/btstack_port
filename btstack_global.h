@@ -33,10 +33,8 @@
 #define BYTES_PER_FRAME (2 * NUM_CHANNELS)
 #define MAX_SBC_FRAME_SIZE 120
 
-#ifdef HAVE_BTSTACK_STDIN
 const char *get_device_addr_string();
 bd_addr_t *get_device_addr();
-#endif
 
 a2dp_sink_demo_stream_endpoint_t *get_stream_endpoint();
 a2dp_sink_demo_a2dp_connection_t *get_a2dp_connection();

@@ -9,14 +9,13 @@
 
 // Port related features
 #define HAVE_ASSERT
-#define HAVE_BTSTACK_STDIN
-#define HAVE_MALLOC
-#define HAVE_POSIX_FILE_IO
-#define HAVE_POSIX_TIME
+#define HAVE_BTSTACK_STDIN  
+#define HAVE_MALLOC     // MUST HAVE ANYWHERE, Use dynamic memory
+#define HAVE_POSIX_FILE_IO   // MUST HAVE ON UNIX, POSIX File i/o used for hci dump
+#define HAVE_POSIX_TIME     // 
 
 #ifdef HAVE_PORTAUDIO
 #define HAVE_BTSTACK_AUDIO_EFFECTIVE_SAMPLERATE
-
 #endif
 
 // BTstack features that can be enabled

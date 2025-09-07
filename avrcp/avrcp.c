@@ -2,7 +2,7 @@
 
 #include <stdio.h>
 
-#include "a2dp/a2dp_cover_art.h"
+#include "avrcp/cover_art.h"
 #include "btstack.h"
 #include "btstack_global.h"
 #include "btstack_types.h"

@@ -1,3 +1,15 @@
+if(APPLE)
+    message(STATUS "building on MacOS!")
+    set(CMAKE_AR "/usr/bin/ar" CACHE FILEPATH "Path to ar executable" FORCE)
+    set(CMAKE_RANLIB /usr/bin/ranlib CACHE FILEPATH "" FORCE)
+    SET(BTSTACK_ROOT "/Users/fanyx/toys/btstack_v1.6.2")
+endif()
+
+if(CMAKE_SYSTEM_NAME STREQUAL "Linux")
+    message(STATUS "Building on Linux!")
+    SET(BTSTACK_ROOT "/home/admin/toys/btstack")
+endif()
+
 cmake_minimum_required(VERSION 3.12)
 project(BTstack-port)
 
@@ -10,7 +22,7 @@ SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 # 路径配置（核心！请根据实际环境修改）
 # BTSTACK_ROOT: BTStack源码根目录
 # DEMO_ROOT: 当前示例程序所在目录（无需修改）
-SET(BTSTACK_ROOT "/Users/fanyx/toys/btstack_v1.6.2")
+
 SET(DEMO_ROOT ${CMAKE_CURRENT_SOURCE_DIR})
 
 
@@ -293,11 +305,4 @@ target_link_libraries(btstack_port
     avrcp
     hci
     )
-
-# 示例程序编译宏定义（核心功能开关）
-target_compile_definitions(btstack_port PRIVATE
-    HAVE_BTSTACK_CONFIG_H  # 使用当前目录的btstack_config.h配置文件
-    PLATFORM_LINUX         # 声明运行在Linux平台
-    ENABLE_SBC_DECODER     # 启用SBC音频解码（A2DP必需）
-)
 

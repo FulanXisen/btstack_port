@@ -35,8 +35,6 @@
  *
  */
 
-#define BTSTACK_FILE__ "main.c"
-
 // *****************************************************************************
 //
 // minimal setup for HCI code
@@ -44,7 +42,6 @@
 // *****************************************************************************
 
 #include <getopt.h>
-#include <hci_dump_posix_stdout.h>
 #include <signal.h>
 #include <stdint.h>
 #include <stdio.h>
@@ -69,8 +66,12 @@
 #include "classic/btstack_link_key_db_tlv.h"
 #include "hal_led.h"
 #include "hci.h"
+#ifdef HAVE_POSIX_FILE_IO
+#include <hci_dump_posix_stdout.h>
+
 #include "hci_dump.h"
 #include "hci_dump_posix_fs.h"
+#endif
 #include "hci_transport.h"
 #include "hci_transport_usb.h"
 
@@ -275,8 +276,10 @@ int main(int argc, const char *argv[]) {
   uint8_t usb_path[USB_MAX_PATH_LEN];
   int usb_path_len = 0;
   const char *usb_path_string = NULL;
-  const char *log_file_path = NULL;
 
+#ifdef HAVE_POSIX_FILE_IO
+  const char *log_file_path = NULL;
+#endif
   // parse command line parameters
   while (true) {
     int c = getopt_long(argc, (char *const *)argv, short_options, long_options,
@@ -292,7 +295,9 @@ int main(int argc, const char *argv[]) {
         usb_path_string = optarg;
         break;
       case 'l':
+#ifdef HAVE_POSIX_FILE_IO
         log_file_path = optarg;
+#endif
         break;
       case 'r':
         tlv_reset = true;
@@ -328,6 +333,7 @@ int main(int argc, const char *argv[]) {
     hci_transport_usb_set_path(usb_path_len, usb_path);
   }
 
+#ifdef HAVE_POSIX_FILE_IO
   // log into file using HCI_DUMP_PACKETLOGGER format
   char pklg_path[100];
   if (log_file_path == NULL) {
@@ -345,6 +351,7 @@ int main(int argc, const char *argv[]) {
   hci_dump_init(hci_dump_impl);
   printf("Packet Log: %s\n", log_file_path);
 
+#endif
   // init HCI
   hci_init(hci_transport_usb_instance(), NULL);
 
