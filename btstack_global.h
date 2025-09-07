@@ -34,11 +34,10 @@ void set_volume_percent(int percent);
 avrcp_battery_status_t get_battery_status();
 void set_battery_status(avrcp_battery_status_t status);
 
-
-uint8_t sdp_avdtp_sink_service_buffer[150];
-uint8_t sdp_avrcp_target_service_buffer[150];
-uint8_t sdp_avrcp_controller_service_buffer[200];
-uint8_t device_id_sdp_service_buffer[100];
+uint8_t (*get_sdp_avdtp_sink_service_buffer())[150];
+uint8_t (*get_sdp_avrcp_target_service_buffer())[150];
+uint8_t (*get_sdp_avrcp_controller_service_buffer())[200];
+uint8_t (*get_sdp_device_id_service_buffer())[100];
 
 btstack_packet_callback_registration_t hci_event_callback_registration;
 // we support all configurations with bitpool 2-53
