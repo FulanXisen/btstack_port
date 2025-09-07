@@ -1,16 +1,17 @@
 #ifndef __BTSTACK_GLOBAL_H__
 #define __BTSTACK_GLOBAL_H__
 
+#include <stdio.h>
+
 #include "bluetooth.h"
-#include "btstack_config.h"
 #include "btstack.h"
-#include "btstack_types.h"
+#include "btstack_config.h"
 #include "btstack_resample.h"
+#include "btstack_types.h"
 #include "classic/avrcp.h"
 #include "classic/avrcp_cover_art_client.h"
 #include "l2cap.h"
 #include "sbc_types.h"
-#include <stdio.h>
 #ifdef HAVE_POSIX_FILE_IO
 #include "wav_util.h"
 #define STORE_TO_WAV_FILE
@@ -27,9 +28,9 @@
 // below 30: add samples, 30-40: fine, above 40: drop samples
 #define OPTIMAL_FRAMES_MIN 60
 #define OPTIMAL_FRAMES_MAX 80
-#define ADDITIONAL_FRAMES  30
+#define ADDITIONAL_FRAMES 30
 #define NUM_CHANNELS 2
-#define BYTES_PER_FRAME     (2*NUM_CHANNELS)
+#define BYTES_PER_FRAME (2 * NUM_CHANNELS)
 #define MAX_SBC_FRAME_SIZE 120
 
 #ifdef HAVE_BTSTACK_STDIN
@@ -51,8 +52,6 @@ uint8_t (*get_sdp_avrcp_target_service_buffer())[150];
 uint8_t (*get_sdp_avrcp_controller_service_buffer())[200];
 uint8_t (*get_sdp_device_id_service_buffer())[100];
 
-
-
 #ifdef STORE_TO_WAV_FILE
 const char *get_wav_filename();
 #endif
@@ -67,7 +66,7 @@ uint16_t get_a2dp_sink_cover_art_cid();
 void set_a2dp_sink_cover_art_cid(uint16_t cid);
 uint16_t *get_a2dp_sink_cover_art_cid_ptr();
 
-uint8_t (*get_a2dp_sink_ertm_buffer())[2000]; 
+uint8_t (*get_a2dp_sink_ertm_buffer())[2000];
 l2cap_ertm_config_t *get_a2dp_sink_ertm_config();
 
 // True for active, False for inactive
@@ -75,7 +74,6 @@ bool get_cover_art_download_status();
 void set_cover_art_download_status(bool status);
 uint32_t get_cover_art_file_size();
 void set_cover_art_file_size(uint32_t size);
-
 
 #ifdef HAVE_POSIX_FILE_IO
 const char *get_thumbnail_path();
@@ -85,6 +83,4 @@ void set_cover_art_file(FILE *file);
 #endif
 #endif
 
-
-
-#endif // __BTSTACK_GLOBAL_H__
+#endif  // __BTSTACK_GLOBAL_H__

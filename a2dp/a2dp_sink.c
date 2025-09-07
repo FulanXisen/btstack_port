@@ -6,7 +6,6 @@
 #include <string.h>
 
 #include "btstack.h"
-
 #include "btstack_global.h"
 #include "btstack_resample.h"
 
@@ -69,15 +68,13 @@
  * file if STORE_TO_WAV_FILE is defined, and/or played using the audio library.
  */
 
- // WAV File
+// WAV File
 #ifdef STORE_TO_WAV_FILE
 uint32_t audio_frame_count = 0;
 #endif
 
-
-
 // SBC Decoder for WAV file or live playback
-const btstack_sbc_decoder_t *   sbc_decoder_instance;
+const btstack_sbc_decoder_t *sbc_decoder_instance;
 btstack_sbc_decoder_bluedroid_t sbc_decoder_context;
 
 unsigned int sbc_frame_size;
@@ -87,10 +84,11 @@ int media_initialized = 0;
 int audio_stream_started;
 btstack_ring_buffer_t decoded_audio_ring_buffer;
 // temp storage of lower-layer request for audio samples
-int16_t * request_buffer;
-int       request_frames;
-uint8_t sbc_frame_storage[(OPTIMAL_FRAMES_MAX + ADDITIONAL_FRAMES) * MAX_SBC_FRAME_SIZE];
-uint8_t decoded_audio_storage[(128+16) * BYTES_PER_FRAME];
+int16_t *request_buffer;
+int request_frames;
+uint8_t sbc_frame_storage[(OPTIMAL_FRAMES_MAX + ADDITIONAL_FRAMES) *
+                          MAX_SBC_FRAME_SIZE];
+uint8_t decoded_audio_storage[(128 + 16) * BYTES_PER_FRAME];
 
 #ifdef HAVE_BTSTACK_AUDIO_EFFECTIVE_SAMPLERATE
 #include "btstack_sample_rate_compensation.h"
@@ -101,8 +99,8 @@ btstack_sample_rate_compensation_t sample_rate_compensation;
 static void playback_handler(int16_t *buffer, uint16_t num_audio_frames);
 
 // media processing
-static int
-media_processing_init(media_codec_configuration_sbc_t *configuration);
+static int media_processing_init(
+    media_codec_configuration_sbc_t *configuration);
 static void media_processing_start(void);
 static void media_processing_pause(void);
 static void media_processing_close(void);
@@ -112,8 +110,8 @@ static int read_media_data_header(uint8_t *packet, int size, int *offset,
 static int read_sbc_header(uint8_t *packet, int size, int *offset,
                            avdtp_sbc_codec_header_t *sbc_header);
 
-static void
-dump_sbc_configuration(media_codec_configuration_sbc_t *configuration);
+static void dump_sbc_configuration(
+    media_codec_configuration_sbc_t *configuration);
 
 void a2dp_sink_packet_handler(uint8_t packet_type, uint16_t channel,
                               uint8_t *packet, uint16_t size) {
@@ -123,134 +121,137 @@ void a2dp_sink_packet_handler(uint8_t packet_type, uint16_t channel,
 
   uint8_t allocation_method;
 
-  if (packet_type != HCI_EVENT_PACKET)
-    return;
-  if (hci_event_packet_get_type(packet) != HCI_EVENT_A2DP_META)
-    return;
+  if (packet_type != HCI_EVENT_PACKET) return;
+  if (hci_event_packet_get_type(packet) != HCI_EVENT_A2DP_META) return;
 
   a2dp_sink_demo_a2dp_connection_t *a2dp_conn = get_a2dp_connection();
 
   switch (packet[2]) {
-  case A2DP_SUBEVENT_SIGNALING_MEDIA_CODEC_OTHER_CONFIGURATION:
-    printf("A2DP  Sink      : Received non SBC codec - not implemented\n");
-    break;
-  case A2DP_SUBEVENT_SIGNALING_MEDIA_CODEC_SBC_CONFIGURATION: {
-    printf("A2DP  Sink      : Received SBC codec configuration\n");
-    a2dp_conn->sbc_configuration.reconfigure =
-        a2dp_subevent_signaling_media_codec_sbc_configuration_get_reconfigure(
-            packet);
-    a2dp_conn->sbc_configuration.num_channels =
-        a2dp_subevent_signaling_media_codec_sbc_configuration_get_num_channels(
-            packet);
-    a2dp_conn->sbc_configuration.sampling_frequency =
-        a2dp_subevent_signaling_media_codec_sbc_configuration_get_sampling_frequency(
-            packet);
-    a2dp_conn->sbc_configuration.block_length =
-        a2dp_subevent_signaling_media_codec_sbc_configuration_get_block_length(
-            packet);
-    a2dp_conn->sbc_configuration.subbands =
-        a2dp_subevent_signaling_media_codec_sbc_configuration_get_subbands(
-            packet);
-    a2dp_conn->sbc_configuration.min_bitpool_value =
-        a2dp_subevent_signaling_media_codec_sbc_configuration_get_min_bitpool_value(
-            packet);
-    a2dp_conn->sbc_configuration.max_bitpool_value =
-        a2dp_subevent_signaling_media_codec_sbc_configuration_get_max_bitpool_value(
-            packet);
+    case A2DP_SUBEVENT_SIGNALING_MEDIA_CODEC_OTHER_CONFIGURATION:
+      printf("A2DP  Sink      : Received non SBC codec - not implemented\n");
+      break;
+    case A2DP_SUBEVENT_SIGNALING_MEDIA_CODEC_SBC_CONFIGURATION: {
+      printf("A2DP  Sink      : Received SBC codec configuration\n");
+      a2dp_conn->sbc_configuration.reconfigure =
+          a2dp_subevent_signaling_media_codec_sbc_configuration_get_reconfigure(
+              packet);
+      a2dp_conn->sbc_configuration.num_channels =
+          a2dp_subevent_signaling_media_codec_sbc_configuration_get_num_channels(
+              packet);
+      a2dp_conn->sbc_configuration.sampling_frequency =
+          a2dp_subevent_signaling_media_codec_sbc_configuration_get_sampling_frequency(
+              packet);
+      a2dp_conn->sbc_configuration.block_length =
+          a2dp_subevent_signaling_media_codec_sbc_configuration_get_block_length(
+              packet);
+      a2dp_conn->sbc_configuration.subbands =
+          a2dp_subevent_signaling_media_codec_sbc_configuration_get_subbands(
+              packet);
+      a2dp_conn->sbc_configuration.min_bitpool_value =
+          a2dp_subevent_signaling_media_codec_sbc_configuration_get_min_bitpool_value(
+              packet);
+      a2dp_conn->sbc_configuration.max_bitpool_value =
+          a2dp_subevent_signaling_media_codec_sbc_configuration_get_max_bitpool_value(
+              packet);
 
-    allocation_method =
-        a2dp_subevent_signaling_media_codec_sbc_configuration_get_allocation_method(
-            packet);
+      allocation_method =
+          a2dp_subevent_signaling_media_codec_sbc_configuration_get_allocation_method(
+              packet);
 
-    // Adapt Bluetooth spec definition to SBC Encoder expected input
-    a2dp_conn->sbc_configuration.allocation_method =
-        (btstack_sbc_allocation_method_t)(allocation_method - 1);
+      // Adapt Bluetooth spec definition to SBC Encoder expected input
+      a2dp_conn->sbc_configuration.allocation_method =
+          (btstack_sbc_allocation_method_t)(allocation_method - 1);
 
-    switch (
-        a2dp_subevent_signaling_media_codec_sbc_configuration_get_channel_mode(
-            packet)) {
-    case AVDTP_CHANNEL_MODE_JOINT_STEREO:
-      a2dp_conn->sbc_configuration.channel_mode = SBC_CHANNEL_MODE_JOINT_STEREO;
-      break;
-    case AVDTP_CHANNEL_MODE_STEREO:
-      a2dp_conn->sbc_configuration.channel_mode = SBC_CHANNEL_MODE_STEREO;
-      break;
-    case AVDTP_CHANNEL_MODE_DUAL_CHANNEL:
-      a2dp_conn->sbc_configuration.channel_mode = SBC_CHANNEL_MODE_DUAL_CHANNEL;
-      break;
-    case AVDTP_CHANNEL_MODE_MONO:
-      a2dp_conn->sbc_configuration.channel_mode = SBC_CHANNEL_MODE_MONO;
-      break;
-    default:
-      btstack_assert(false);
-      break;
-    }
-    dump_sbc_configuration(&a2dp_conn->sbc_configuration);
-    break;
-  }
-
-  case A2DP_SUBEVENT_STREAM_ESTABLISHED:
-    status = a2dp_subevent_stream_established_get_status(packet);
-    if (status != ERROR_CODE_SUCCESS) {
-      printf("A2DP  Sink      : Streaming connection failed, status 0x%02x\n",
-             status);
+      switch (
+          a2dp_subevent_signaling_media_codec_sbc_configuration_get_channel_mode(
+              packet)) {
+        case AVDTP_CHANNEL_MODE_JOINT_STEREO:
+          a2dp_conn->sbc_configuration.channel_mode =
+              SBC_CHANNEL_MODE_JOINT_STEREO;
+          break;
+        case AVDTP_CHANNEL_MODE_STEREO:
+          a2dp_conn->sbc_configuration.channel_mode = SBC_CHANNEL_MODE_STEREO;
+          break;
+        case AVDTP_CHANNEL_MODE_DUAL_CHANNEL:
+          a2dp_conn->sbc_configuration.channel_mode =
+              SBC_CHANNEL_MODE_DUAL_CHANNEL;
+          break;
+        case AVDTP_CHANNEL_MODE_MONO:
+          a2dp_conn->sbc_configuration.channel_mode = SBC_CHANNEL_MODE_MONO;
+          break;
+        default:
+          btstack_assert(false);
+          break;
+      }
+      dump_sbc_configuration(&a2dp_conn->sbc_configuration);
       break;
     }
 
-    a2dp_subevent_stream_established_get_bd_addr(packet, a2dp_conn->addr);
-    a2dp_conn->a2dp_cid = a2dp_subevent_stream_established_get_a2dp_cid(packet);
-    a2dp_conn->a2dp_local_seid =
-        a2dp_subevent_stream_established_get_local_seid(packet);
-    a2dp_conn->stream_state = STREAM_STATE_OPEN;
+    case A2DP_SUBEVENT_STREAM_ESTABLISHED:
+      status = a2dp_subevent_stream_established_get_status(packet);
+      if (status != ERROR_CODE_SUCCESS) {
+        printf("A2DP  Sink      : Streaming connection failed, status 0x%02x\n",
+               status);
+        break;
+      }
 
-    printf("A2DP  Sink      : Streaming connection is established, address %s, "
-           "cid 0x%02x, local seid %d\n",
-           bd_addr_to_str(a2dp_conn->addr), a2dp_conn->a2dp_cid,
-           a2dp_conn->a2dp_local_seid);
+      a2dp_subevent_stream_established_get_bd_addr(packet, a2dp_conn->addr);
+      a2dp_conn->a2dp_cid =
+          a2dp_subevent_stream_established_get_a2dp_cid(packet);
+      a2dp_conn->a2dp_local_seid =
+          a2dp_subevent_stream_established_get_local_seid(packet);
+      a2dp_conn->stream_state = STREAM_STATE_OPEN;
+
+      printf(
+          "A2DP  Sink      : Streaming connection is established, address %s, "
+          "cid 0x%02x, local seid %d\n",
+          bd_addr_to_str(a2dp_conn->addr), a2dp_conn->a2dp_cid,
+          a2dp_conn->a2dp_local_seid);
 #ifdef HAVE_BTSTACK_STDIN
-    // use address for outgoing connections
-    memcpy(*get_device_addr(), a2dp_conn->addr, 6);
+      // use address for outgoing connections
+      memcpy(*get_device_addr(), a2dp_conn->addr, 6);
 #endif
-    break;
+      break;
 
 #ifdef ENABLE_AVDTP_ACCEPTOR_EXPLICIT_START_STREAM_CONFIRMATION
-  case A2DP_SUBEVENT_START_STREAM_REQUESTED:
-    printf("A2DP  Sink      : Explicit Accept to start stream, local_seid %d\n",
-           a2dp_subevent_start_stream_requested_get_local_seid(packet));
-    a2dp_sink_start_stream_accept(a2dp_cid, a2dp_local_seid);
-    break;
+    case A2DP_SUBEVENT_START_STREAM_REQUESTED:
+      printf(
+          "A2DP  Sink      : Explicit Accept to start stream, local_seid %d\n",
+          a2dp_subevent_start_stream_requested_get_local_seid(packet));
+      a2dp_sink_start_stream_accept(a2dp_cid, a2dp_local_seid);
+      break;
 #endif
-  case A2DP_SUBEVENT_STREAM_STARTED:
-    printf("A2DP  Sink      : Stream started\n");
-    a2dp_conn->stream_state = STREAM_STATE_PLAYING;
-    if (a2dp_conn->sbc_configuration.reconfigure) {
+    case A2DP_SUBEVENT_STREAM_STARTED:
+      printf("A2DP  Sink      : Stream started\n");
+      a2dp_conn->stream_state = STREAM_STATE_PLAYING;
+      if (a2dp_conn->sbc_configuration.reconfigure) {
+        media_processing_close();
+      }
+      // prepare media processing
+      media_processing_init(&a2dp_conn->sbc_configuration);
+      // audio stream is started when buffer reaches minimal level
+      break;
+
+    case A2DP_SUBEVENT_STREAM_SUSPENDED:
+      printf("A2DP  Sink      : Stream paused\n");
+      a2dp_conn->stream_state = STREAM_STATE_PAUSED;
+      media_processing_pause();
+      break;
+
+    case A2DP_SUBEVENT_STREAM_RELEASED:
+      printf("A2DP  Sink      : Stream released\n");
+      a2dp_conn->stream_state = STREAM_STATE_CLOSED;
       media_processing_close();
-    }
-    // prepare media processing
-    media_processing_init(&a2dp_conn->sbc_configuration);
-    // audio stream is started when buffer reaches minimal level
-    break;
+      break;
 
-  case A2DP_SUBEVENT_STREAM_SUSPENDED:
-    printf("A2DP  Sink      : Stream paused\n");
-    a2dp_conn->stream_state = STREAM_STATE_PAUSED;
-    media_processing_pause();
-    break;
+    case A2DP_SUBEVENT_SIGNALING_CONNECTION_RELEASED:
+      printf("A2DP  Sink      : Signaling connection released\n");
+      a2dp_conn->a2dp_cid = 0;
+      media_processing_close();
+      break;
 
-  case A2DP_SUBEVENT_STREAM_RELEASED:
-    printf("A2DP  Sink      : Stream released\n");
-    a2dp_conn->stream_state = STREAM_STATE_CLOSED;
-    media_processing_close();
-    break;
-
-  case A2DP_SUBEVENT_SIGNALING_CONNECTION_RELEASED:
-    printf("A2DP  Sink      : Signaling connection released\n");
-    a2dp_conn->a2dp_cid = 0;
-    media_processing_close();
-    break;
-
-  default:
-    break;
+    default:
+      break;
   }
 }
 
@@ -271,12 +272,10 @@ void handle_l2cap_media_data_packet(uint8_t seid, uint8_t *packet,
   int pos = 0;
 
   avdtp_media_packet_header_t media_header;
-  if (!read_media_data_header(packet, size, &pos, &media_header))
-    return;
+  if (!read_media_data_header(packet, size, &pos, &media_header)) return;
 
   avdtp_sbc_codec_header_t sbc_header;
-  if (!read_sbc_header(packet, size, &pos, &sbc_header))
-    return;
+  if (!read_sbc_header(packet, size, &pos, &sbc_header)) return;
 
   int packet_length = size - pos;
   uint8_t *packet_begin = packet + pos;
@@ -327,11 +326,11 @@ void handle_l2cap_media_data_packet(uint8_t seid, uint8_t *packet,
   uint32_t compensation = 0x00100;
 
   if (sbc_frames_in_buffer < OPTIMAL_FRAMES_MIN) {
-    resampling_factor = nominal_factor - compensation; // stretch samples
+    resampling_factor = nominal_factor - compensation;  // stretch samples
   } else if (sbc_frames_in_buffer <= OPTIMAL_FRAMES_MAX) {
-    resampling_factor = nominal_factor; // nothing to do
+    resampling_factor = nominal_factor;  // nothing to do
   } else {
-    resampling_factor = nominal_factor + compensation; // compress samples
+    resampling_factor = nominal_factor + compensation;  // compress samples
   }
 
   btstack_resample_set_factor(&resample_instance, resampling_factor);
@@ -343,7 +342,6 @@ void handle_l2cap_media_data_packet(uint8_t seid, uint8_t *packet,
 }
 
 static void playback_handler(int16_t *buffer, uint16_t num_audio_frames) {
-
 #ifdef STORE_TO_WAV_FILE
   int wav_samples = num_audio_frames * NUM_CHANNELS;
   int16_t *wav_buffer = buffer;
@@ -385,7 +383,7 @@ static void handle_pcm_data(int16_t *data, int num_audio_frames,
                             int num_channels, int sample_rate, void *context) {
   UNUSED(sample_rate);
   UNUSED(context);
-  UNUSED(num_channels); // must be stereo == 2
+  UNUSED(num_channels);  // must be stereo == 2
 
   static int count = 0;
 
@@ -408,7 +406,7 @@ static void handle_pcm_data(int16_t *data, int num_audio_frames,
   }
 
   // resample into request buffer - add some additional space for resampling
-  int16_t output_buffer[(128 + 16) * NUM_CHANNELS]; // 16 * 8 * 2
+  int16_t output_buffer[(128 + 16) * NUM_CHANNELS];  // 16 * 8 * 2
   uint32_t resampled_frames = btstack_resample_block(
       &resample_instance, data, num_audio_frames, output_buffer);
 
@@ -431,10 +429,9 @@ static void handle_pcm_data(int16_t *data, int num_audio_frames,
   }
 }
 
-static int
-media_processing_init(media_codec_configuration_sbc_t *configuration) {
-  if (media_initialized)
-    return 0;
+static int media_processing_init(
+    media_codec_configuration_sbc_t *configuration) {
+  if (media_initialized) return 0;
   sbc_decoder_instance =
       btstack_sbc_decoder_bluedroid_init_instance(&sbc_decoder_context);
   sbc_decoder_instance->configure(&sbc_decoder_context, SBC_MODE_STANDARD,
@@ -464,8 +461,7 @@ media_processing_init(media_codec_configuration_sbc_t *configuration) {
 }
 
 static void media_processing_start(void) {
-  if (!media_initialized)
-    return;
+  if (!media_initialized) return;
 
 #ifdef HAVE_BTSTACK_AUDIO_EFFECTIVE_SAMPLERATE
   btstack_sample_rate_compensation_reset(&sample_rate_compensation,
@@ -480,8 +476,7 @@ static void media_processing_start(void) {
 }
 
 static void media_processing_pause(void) {
-  if (!media_initialized)
-    return;
+  if (!media_initialized) return;
 
   // stop audio playback
   audio_stream_started = 0;
@@ -499,8 +494,7 @@ static void media_processing_pause(void) {
 }
 
 static void media_processing_close(void) {
-  if (!media_initialized)
-    return;
+  if (!media_initialized) return;
 
   media_initialized = 0;
   audio_stream_started = 0;
@@ -515,10 +509,11 @@ static void media_processing_close(void) {
                              sbc_decoder_context.bad_frames_nr +
                              sbc_decoder_context.zero_frames_nr;
 
-  printf("WAV Writer: Decoding done. Processed %u SBC frames:\n - %d good\n - "
-         "%d bad\n",
-         total_frames_nr, sbc_decoder_context.good_frames_nr,
-         total_frames_nr - sbc_decoder_context.good_frames_nr);
+  printf(
+      "WAV Writer: Decoding done. Processed %u SBC frames:\n - %d good\n - "
+      "%d bad\n",
+      total_frames_nr, sbc_decoder_context.good_frames_nr,
+      total_frames_nr - sbc_decoder_context.good_frames_nr);
   printf("WAV Writer: Wrote %u audio frames to wav file: %s\n",
          audio_frame_count, get_wav_filename());
 #endif
@@ -533,7 +528,7 @@ static void media_processing_close(void) {
 
 static int read_sbc_header(uint8_t *packet, int size, int *offset,
                            avdtp_sbc_codec_header_t *sbc_header) {
-  int sbc_header_len = 12; // without crc
+  int sbc_header_len = 12;  // without crc
   int pos = *offset;
 
   if (size - pos < sbc_header_len) {
@@ -553,13 +548,14 @@ static int read_sbc_header(uint8_t *packet, int size, int *offset,
 
 static int read_media_data_header(uint8_t *packet, int size, int *offset,
                                   avdtp_media_packet_header_t *media_header) {
-  int media_header_len = 12; // without crc
+  int media_header_len = 12;  // without crc
   int pos = *offset;
 
   if (size - pos < media_header_len) {
-    printf("Not enough data to read media packet header, expected %d, received "
-           "%d\n",
-           media_header_len, size - pos);
+    printf(
+        "Not enough data to read media packet header, expected %d, received "
+        "%d\n",
+        media_header_len, size - pos);
     return 0;
   }
 
@@ -585,8 +581,8 @@ static int read_media_data_header(uint8_t *packet, int size, int *offset,
   return 1;
 }
 
-static void
-dump_sbc_configuration(media_codec_configuration_sbc_t *configuration) {
+static void dump_sbc_configuration(
+    media_codec_configuration_sbc_t *configuration) {
   printf("    - num_channels: %d\n", configuration->num_channels);
   printf("    - sampling_frequency: %d\n", configuration->sampling_frequency);
   printf("    - channel_mode: %d\n", configuration->channel_mode);

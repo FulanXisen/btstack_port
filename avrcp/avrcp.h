@@ -1,8 +1,9 @@
 #ifndef __AVRCP_H__
 #define __AVRCP_H__
 
-#include "btstack_config.h"
 #include <stdint.h>
+
+#include "btstack_config.h"
 void avrcp_packet_handler(uint8_t packet_type, uint16_t channel,
                           uint8_t *packet, uint16_t size);
 void avrcp_controller_packet_handler(uint8_t packet_type, uint16_t channel,
