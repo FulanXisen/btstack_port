@@ -69,8 +69,8 @@ FILE * a2dp_sink_cover_art_file;
 
 // WAV File
 #ifdef STORE_TO_WAV_FILE
-static uint32_t audio_frame_count = 0;
-static char * wav_filename = "a2dp_sink_demo.wav";
+uint32_t audio_frame_count = 0;
+char * wav_filename = "a2dp_sink_demo.wav";
 #endif
 
 // SBC Decoder for WAV file or live playback
@@ -103,6 +103,6 @@ uint8_t decoded_audio_storage[(128+16) * BYTES_PER_FRAME];
 int l2cap_stream_started;
 #endif
 #ifdef HAVE_BTSTACK_AUDIO_EFFECTIVE_SAMPLERATE
-static btstack_sample_rate_compensation_t sample_rate_compensation;
+btstack_sample_rate_compensation_t sample_rate_compensation;
 #endif
 #endif
