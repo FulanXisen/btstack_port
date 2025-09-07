@@ -11,11 +11,11 @@ static void show_usage(void){
     bd_addr_t      iut_address;
     gap_local_bd_addr(iut_address);
     printf("\n--- A2DP Sink Demo Console %s ---\n", bd_addr_to_str(iut_address));
-    printf("b - A2DP Sink create connection to addr %s\n", bd_addr_to_str(btstack_global_device_addr));
+    printf("b - A2DP Sink create connection to addr %s\n", bd_addr_to_str(*get_device_addr()));
     printf("B - A2DP Sink disconnect\n");
 
     printf("\n--- AVRCP Controller ---\n");
-    printf("c - AVRCP create connection to addr %s\n", bd_addr_to_str(btstack_global_device_addr));
+    printf("c - AVRCP create connection to addr %s\n", bd_addr_to_str(*get_device_addr()));
     printf("C - AVRCP disconnect\n");
     printf("O - get play status\n");
     printf("j - get now playing info\n");
@@ -50,7 +50,7 @@ static void show_usage(void){
 
 #ifdef ENABLE_AVRCP_COVER_ART
     printf("\n--- Cover Art Client ---\n");
-    printf("d - connect to addr %s\n", bd_addr_to_str(btstack_global_device_addr));
+    printf("d - connect to addr %s\n", bd_addr_to_str(*get_device_addr()));
     printf("D - disconnect\n");
     if (a2dp_sink_demo_cover_art_client_connected == false){
         if (a2dp_sink_demo_avrcp_connection.avrcp_cid == 0){
@@ -79,20 +79,20 @@ static void stdin_process(char cmd){
 
     switch (cmd){
         case 'b':
-            status = a2dp_sink_establish_stream(btstack_global_device_addr, &a2dp_connection->a2dp_cid);
+            status = a2dp_sink_establish_stream(*get_device_addr(), &a2dp_connection->a2dp_cid);
             printf(" - Create AVDTP connection to addr %s, and local seid %d, cid 0x%02x.\n",
-                   bd_addr_to_str(btstack_global_device_addr), a2dp_connection->a2dp_local_seid, a2dp_connection->a2dp_cid);
+                   bd_addr_to_str(*get_device_addr()), a2dp_connection->a2dp_local_seid, a2dp_connection->a2dp_cid);
             break;
         case 'B':
-            printf(" - AVDTP disconnect from addr %s.\n", bd_addr_to_str(btstack_global_device_addr));
+            printf(" - AVDTP disconnect from addr %s.\n", bd_addr_to_str(*get_device_addr()));
             a2dp_sink_disconnect(a2dp_connection->a2dp_cid);
             break;
         case 'c':
-            printf(" - Create AVRCP connection to addr %s.\n", bd_addr_to_str(btstack_global_device_addr));
-            status = avrcp_connect(btstack_global_device_addr, &avrcp_connection->avrcp_cid);
+            printf(" - Create AVRCP connection to addr %s.\n", bd_addr_to_str(*get_device_addr()));
+            status = avrcp_connect(*get_device_addr(), &avrcp_connection->avrcp_cid);
             break;
         case 'C':
-            printf(" - AVRCP disconnect from addr %s.\n", bd_addr_to_str(btstack_global_device_addr));
+            printf(" - AVRCP disconnect from addr %s.\n", bd_addr_to_str(*get_device_addr()));
             status = avrcp_disconnect(avrcp_connection->avrcp_cid);
             break;
 
@@ -231,11 +231,11 @@ static void stdin_process(char cmd){
             break;
 #ifdef ENABLE_AVRCP_COVER_ART
         case 'd':
-            printf(" - Create AVRCP Cover Art connection to addr %s.\n", bd_addr_to_str(btstack_global_device_addr));
+            printf(" - Create AVRCP Cover Art connection to addr %s.\n", bd_addr_to_str(*get_device_addr()));
             status = a2dp_sink_demo_cover_art_connect();
             break;
         case 'D':
-            printf(" - AVRCP Cover Art disconnect from addr %s.\n", bd_addr_to_str(btstack_global_device_addr));
+            printf(" - AVRCP Cover Art disconnect from addr %s.\n", bd_addr_to_str(*get_device_addr()));
             status = avrcp_cover_art_client_disconnect(a2dp_sink_demo_cover_art_cid);
             break;
         case '@':
@@ -404,7 +404,7 @@ int btstack_main(int argc, const char * argv[]){
 
 #ifdef HAVE_BTSTACK_STDIN
     // parse human-readable Bluetooth address
-    sscanf_bd_addr(btstack_global_device_addr_string, btstack_global_device_addr);
+    sscanf_bd_addr(get_device_addr_string(), *get_device_addr());
     btstack_stdin_setup(stdin_process);
 #endif
 

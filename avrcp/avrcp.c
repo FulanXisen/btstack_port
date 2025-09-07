@@ -39,7 +39,7 @@ void avrcp_packet_handler(uint8_t packet_type, uint16_t channel,
 #ifdef HAVE_BTSTACK_STDIN
     // use address for outgoing connections
     avrcp_subevent_connection_established_get_bd_addr(
-        packet, btstack_global_device_addr);
+        packet, *get_device_addr());
 #endif
 
     avrcp_target_support_event(connection->avrcp_cid,

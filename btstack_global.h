@@ -1,6 +1,7 @@
 #ifndef __BTSTACK_GLOBAL_H__
 #define __BTSTACK_GLOBAL_H__
 
+#include "bluetooth.h"
 #include "btstack_config.h"
 #include "btstack.h"
 #include "btstack_types.h"
@@ -19,8 +20,8 @@
 #endif
 
 #ifdef HAVE_BTSTACK_STDIN
-const char *btstack_global_device_addr_string = "00:1B:DC:08:E2:72"; // pts v5.0
-bd_addr_t btstack_global_device_addr;
+const char *get_device_addr_string();
+bd_addr_t *get_device_addr();
 #endif
 
 a2dp_sink_demo_stream_endpoint_t a2dp_sink_demo_stream_endpoint;

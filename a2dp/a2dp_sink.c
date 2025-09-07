@@ -180,7 +180,7 @@ void a2dp_sink_packet_handler(uint8_t packet_type, uint16_t channel,
            a2dp_conn->a2dp_local_seid);
 #ifdef HAVE_BTSTACK_STDIN
     // use address for outgoing connections
-    memcpy(btstack_global_device_addr, a2dp_conn->addr, 6);
+    memcpy(*get_device_addr(), a2dp_conn->addr, 6);
 #endif
     break;
 

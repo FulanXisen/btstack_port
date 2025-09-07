@@ -83,7 +83,7 @@ uint8_t a2dp_sink_demo_cover_art_connect(void) {
   uint8_t status;
   status = avrcp_cover_art_client_connect(
       &a2dp_sink_demo_cover_art_client, a2dp_sink_demo_cover_art_packet_handler,
-      btstack_global_device_addr, a2dp_sink_demo_ertm_buffer,
+      *get_device_addr(), a2dp_sink_demo_ertm_buffer,
       sizeof(a2dp_sink_demo_ertm_buffer), &a2dp_sink_demo_ertm_config,
       &a2dp_sink_demo_cover_art_cid);
   return status;
