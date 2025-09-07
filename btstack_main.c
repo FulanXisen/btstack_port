@@ -7,6 +7,15 @@
 #include "classic/avrcp.h"
 #include "hci/hci.h"
 
+static btstack_packet_callback_registration_t hci_event_callback_registration;
+
+// we support all configurations with bitpool 2-53
+uint8_t media_sbc_codec_capabilities[] = {
+    0xFF, //(AVDTP_SBC_44100 << 4) | AVDTP_SBC_STEREO,
+    0xFF, //(AVDTP_SBC_BLOCK_LENGTH_16 << 4) | (AVDTP_SBC_SUBBANDS_8 << 2) |
+          // AVDTP_SBC_ALLOCATION_METHOD_LOUDNESS,
+    2, 53};
+
 #ifdef HAVE_BTSTACK_STDIN
 static void show_usage(void){
     bd_addr_t      iut_address;
@@ -53,13 +62,13 @@ static void show_usage(void){
     printf("\n--- Cover Art Client ---\n");
     printf("d - connect to addr %s\n", bd_addr_to_str(*get_device_addr()));
     printf("D - disconnect\n");
-    if (a2dp_sink_demo_cover_art_client_connected == false){
+    if (get_a2dp_sink_cover_art_client_connected() == false){
         if (get_avrcp_connection()->avrcp_cid == 0){
             printf("Not connected, press 'b' or 'c' to first connect AVRCP, then press 'd' to connect cover art client\n");
         } else {
             printf("Not connected, press 'd' to connect cover art client\n");
         }
-    } else if (a2dp_sink_demo_image_handle[0] == 0){
+    } else if ((*get_a2dp_sink_image_handle())[0] == 0){
         printf("No image handle, use 'j' to get current track info\n");
     }
     printf("---\n");
@@ -245,16 +254,16 @@ static void stdin_process(char cmd){
             break;
         case 'D':
             printf(" - AVRCP Cover Art disconnect from addr %s.\n", bd_addr_to_str(*get_device_addr()));
-            status = avrcp_cover_art_client_disconnect(a2dp_sink_demo_cover_art_cid);
+            status = avrcp_cover_art_client_disconnect( get_a2dp_sink_cover_art_cid());
             break;
         case '@':
-            printf("Get linked thumbnail for '%s'\n", a2dp_sink_demo_image_handle);
+            printf("Get linked thumbnail for '%s'\n", (*get_a2dp_sink_image_handle()));
 #ifdef HAVE_POSIX_FILE_IO
             a2dp_sink_cover_art_file = fopen(a2dp_sink_demo_thumbnail_path, "w");
 #endif
             a2dp_sink_cover_art_download_active = true;
             a2dp_sink_cover_art_file_size = 0;
-            status = avrcp_cover_art_client_get_linked_thumbnail(a2dp_sink_demo_cover_art_cid, a2dp_sink_demo_image_handle);
+            status = avrcp_cover_art_client_get_linked_thumbnail(get_a2dp_sink_cover_art_cid(), (*get_a2dp_sink_image_handle()));
             break;
 #endif
         default:

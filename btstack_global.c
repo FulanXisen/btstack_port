@@ -13,12 +13,15 @@ static a2dp_sink_demo_avrcp_connection_t a2dp_sink_demo_avrcp_connection;
 static int volume_percentage = 0;
 static avrcp_battery_status_t battery_status = AVRCP_BATTERY_STATUS_WARNING;
 
-uint8_t sdp_avdtp_sink_service_buffer[150];
-uint8_t sdp_avrcp_target_service_buffer[150];
-uint8_t sdp_avrcp_controller_service_buffer[200];
-uint8_t sdp_device_id_service_buffer[100];
+static uint8_t sdp_avdtp_sink_service_buffer[150];
+static uint8_t sdp_avrcp_target_service_buffer[150];
+static uint8_t sdp_avrcp_controller_service_buffer[200];
+static uint8_t sdp_device_id_service_buffer[100];
 
-
+static char a2dp_sink_demo_image_handle[8];
+static avrcp_cover_art_client_t a2dp_sink_demo_cover_art_client;
+static bool a2dp_sink_demo_cover_art_client_connected;
+static uint16_t a2dp_sink_demo_cover_art_cid;
 
 const char *get_device_addr_string() { return device_addr_string; }
 bd_addr_t *get_device_addr() { return &device_addr; }
@@ -51,4 +54,24 @@ uint8_t (*get_sdp_avrcp_controller_service_buffer())[200] {
 }
 uint8_t (*get_sdp_device_id_service_buffer())[100] {
   return &sdp_device_id_service_buffer;
+}
+
+char (*get_a2dp_sink_image_handle())[8] {
+  return &a2dp_sink_demo_image_handle;
+}
+
+avrcp_cover_art_client_t *get_a2dp_sink_cover_art_client() {
+  return &a2dp_sink_demo_cover_art_client;
+}
+bool get_a2dp_sink_cover_art_client_connected() {
+  return a2dp_sink_demo_cover_art_client_connected;
+}
+void set_a2dp_sink_cover_art_client_connected(bool connected) {
+  a2dp_sink_demo_cover_art_client_connected = connected;
+}
+uint16_t get_a2dp_sink_cover_art_cid() {
+  return a2dp_sink_demo_cover_art_cid;
+}
+void set_a2dp_sink_cover_art_cid(uint16_t cid) {
+  a2dp_sink_demo_cover_art_cid = cid;
 }

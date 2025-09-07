@@ -39,11 +39,11 @@ void a2dp_sink_demo_cover_art_packet_handler(uint8_t packet_type,
           printf("Cover Art       : connection established, cover art cid "
                  "0x%02x\n",
                  cid);
-          a2dp_sink_demo_cover_art_client_connected = true;
+          set_a2dp_sink_cover_art_client_connected(true);
         } else {
           printf("Cover Art       : connection failed, status 0x%02x\n",
                  status);
-          a2dp_sink_demo_cover_art_cid = 0;
+          set_a2dp_sink_cover_art_cid(0);
         }
         break;
       case AVRCP_SUBEVENT_COVER_ART_OPERATION_COMPLETE:
@@ -60,8 +60,8 @@ void a2dp_sink_demo_cover_art_packet_handler(uint8_t packet_type,
         }
         break;
       case AVRCP_SUBEVENT_COVER_ART_CONNECTION_RELEASED:
-        a2dp_sink_demo_cover_art_client_connected = false;
-        a2dp_sink_demo_cover_art_cid = 0;
+        set_a2dp_sink_cover_art_client_connected(false);
+        set_a2dp_sink_cover_art_cid(0);
         printf("Cover Art       : connection released 0x%02x\n",
                avrcp_subevent_cover_art_connection_released_get_cover_art_cid(
                    packet));
@@ -82,10 +82,10 @@ void a2dp_sink_demo_cover_art_packet_handler(uint8_t packet_type,
 uint8_t a2dp_sink_demo_cover_art_connect(void) {
   uint8_t status;
   status = avrcp_cover_art_client_connect(
-      &a2dp_sink_demo_cover_art_client, a2dp_sink_demo_cover_art_packet_handler,
+      get_a2dp_sink_cover_art_client(), a2dp_sink_demo_cover_art_packet_handler,
       *get_device_addr(), a2dp_sink_demo_ertm_buffer,
       sizeof(a2dp_sink_demo_ertm_buffer), &a2dp_sink_demo_ertm_config,
-      &a2dp_sink_demo_cover_art_cid);
+      get_a2dp_sink_cover_art_cid_ptr());
   return status;
 }
 

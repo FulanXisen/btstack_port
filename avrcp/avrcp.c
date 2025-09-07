@@ -258,17 +258,17 @@ void avrcp_controller_packet_handler(uint8_t packet_type, uint16_t channel,
 
 #ifdef ENABLE_AVRCP_COVER_ART
   case AVRCP_SUBEVENT_NOTIFICATION_EVENT_UIDS_CHANGED:
-    if (a2dp_sink_demo_cover_art_client_connected) {
+    if (get_a2dp_sink_cover_art_client_connected()) {
       printf("AVRCP Controller: UIDs changed -> disconnect cover art client\n");
-      avrcp_cover_art_client_disconnect(a2dp_sink_demo_cover_art_cid);
+      avrcp_cover_art_client_disconnect(get_a2dp_sink_cover_art_cid());
     }
     break;
 
   case AVRCP_SUBEVENT_NOW_PLAYING_COVER_ART_INFO:
     if (avrcp_subevent_now_playing_cover_art_info_get_value_len(packet) == 7) {
-      memcpy(a2dp_sink_demo_image_handle,
+      memcpy((*get_a2dp_sink_image_handle()),
              avrcp_subevent_now_playing_cover_art_info_get_value(packet), 7);
-      printf("AVRCP Controller: Cover Art %s\n", a2dp_sink_demo_image_handle);
+      printf("AVRCP Controller: Cover Art %s\n", (*get_a2dp_sink_image_handle()));
     }
     break;
 #endif

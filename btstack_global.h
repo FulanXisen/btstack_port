@@ -7,6 +7,8 @@
 #include "btstack_types.h"
 #include "btstack_resample.h"
 #include "classic/avrcp.h"
+#include "classic/avrcp_cover_art_client.h"
+#include "sbc_types.h"
 #include <stdio.h>
 #ifdef HAVE_POSIX_FILE_IO
 #include "wav_util.h"
@@ -39,19 +41,19 @@ uint8_t (*get_sdp_avrcp_target_service_buffer())[150];
 uint8_t (*get_sdp_avrcp_controller_service_buffer())[200];
 uint8_t (*get_sdp_device_id_service_buffer())[100];
 
-btstack_packet_callback_registration_t hci_event_callback_registration;
-// we support all configurations with bitpool 2-53
-uint8_t media_sbc_codec_capabilities[] = {
-    0xFF, //(AVDTP_SBC_44100 << 4) | AVDTP_SBC_STEREO,
-    0xFF, //(AVDTP_SBC_BLOCK_LENGTH_16 << 4) | (AVDTP_SBC_SUBBANDS_8 << 2) |
-          // AVDTP_SBC_ALLOCATION_METHOD_LOUDNESS,
-    2, 53};
+
+
 
 #ifdef ENABLE_AVRCP_COVER_ART
-char a2dp_sink_demo_image_handle[8];
-avrcp_cover_art_client_t a2dp_sink_demo_cover_art_client;
-bool a2dp_sink_demo_cover_art_client_connected;
-uint16_t a2dp_sink_demo_cover_art_cid;
+char (*get_a2dp_sink_image_handle())[8];
+
+avrcp_cover_art_client_t *get_a2dp_sink_cover_art_client();
+bool get_a2dp_sink_cover_art_client_connected();
+void set_a2dp_sink_cover_art_client_connected(bool connected);
+uint16_t get_a2dp_sink_cover_art_cid();
+void set_a2dp_sink_cover_art_cid(uint16_t cid);
+uint16_t *get_a2dp_sink_cover_art_cid_ptr();
+
 uint8_t a2dp_sink_demo_ertm_buffer[2000];
 l2cap_ertm_config_t a2dp_sink_demo_ertm_config = {
         1,  // ertm mandatory
