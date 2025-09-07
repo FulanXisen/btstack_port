@@ -6,6 +6,7 @@
 #include "btstack.h"
 #include "btstack_types.h"
 #include "btstack_resample.h"
+#include "classic/avrcp.h"
 #include <stdio.h>
 #ifdef HAVE_POSIX_FILE_IO
 #include "wav_util.h"
@@ -28,10 +29,11 @@ a2dp_sink_demo_stream_endpoint_t *get_stream_endpoint();
 a2dp_sink_demo_a2dp_connection_t *get_a2dp_connection();
 a2dp_sink_demo_avrcp_connection_t *get_avrcp_connection();
 
+int get_volume_percent();
+void set_volume_percent(int percent);
+avrcp_battery_status_t get_battery_status();
+void set_battery_status(avrcp_battery_status_t status);
 
-// sink state
-int volume_percentage = 0;
-avrcp_battery_status_t battery_status = AVRCP_BATTERY_STATUS_WARNING;
 
 uint8_t sdp_avdtp_sink_service_buffer[150];
 uint8_t sdp_avrcp_target_service_buffer[150];

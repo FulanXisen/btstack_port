@@ -45,7 +45,7 @@ void avrcp_packet_handler(uint8_t packet_type, uint16_t channel,
                                AVRCP_NOTIFICATION_EVENT_VOLUME_CHANGED);
     avrcp_target_support_event(connection->avrcp_cid,
                                AVRCP_NOTIFICATION_EVENT_BATT_STATUS_CHANGED);
-    avrcp_target_battery_status_changed(connection->avrcp_cid, battery_status);
+    avrcp_target_battery_status_changed(connection->avrcp_cid, get_battery_status());
 
     // query supported events:
     avrcp_controller_get_supported_events(connection->avrcp_cid);
@@ -303,8 +303,8 @@ void avrcp_target_packet_handler(uint8_t packet_type, uint16_t channel,
   case AVRCP_SUBEVENT_NOTIFICATION_VOLUME_CHANGED:
     volume =
         avrcp_subevent_notification_volume_changed_get_absolute_volume(packet);
-    volume_percentage = volume * 100 / 127;
-    printf("AVRCP Target    : Volume set to %d%% (%d)\n", volume_percentage,
+    set_volume_percent(volume * 100 / 127);
+    printf("AVRCP Target    : Volume set to %d%% (%d)\n", get_volume_percent(),
            volume);
     avrcp_volume_changed(volume);
     break;

@@ -9,16 +9,26 @@ static a2dp_sink_demo_stream_endpoint_t a2dp_sink_demo_stream_endpoint;
 static a2dp_sink_demo_a2dp_connection_t a2dp_sink_demo_a2dp_connection;
 static a2dp_sink_demo_avrcp_connection_t a2dp_sink_demo_avrcp_connection;
 
+// sink state
+static int volume_percentage = 0;
+static avrcp_battery_status_t battery_status = AVRCP_BATTERY_STATUS_WARNING;
+
 const char *get_device_addr_string() { return device_addr_string; }
 bd_addr_t *get_device_addr() { return &device_addr; }
 
+a2dp_sink_demo_stream_endpoint_t *get_stream_endpoint() {
+  return &a2dp_sink_demo_stream_endpoint;
+}
+a2dp_sink_demo_a2dp_connection_t *get_a2dp_connection() {
+  return &a2dp_sink_demo_a2dp_connection;
+}
+a2dp_sink_demo_avrcp_connection_t *get_avrcp_connection() {
+  return &a2dp_sink_demo_avrcp_connection;
+}
 
-a2dp_sink_demo_stream_endpoint_t *get_stream_endpoint(){
-    return &a2dp_sink_demo_stream_endpoint;
-}
-a2dp_sink_demo_a2dp_connection_t *get_a2dp_connection(){
-    return &a2dp_sink_demo_a2dp_connection;
-}
-a2dp_sink_demo_avrcp_connection_t *get_avrcp_connection(){
-    return &a2dp_sink_demo_avrcp_connection;
+int get_volume_percent() { return volume_percentage; }
+void set_volume_percent(int percent) { volume_percentage = percent; }
+avrcp_battery_status_t get_battery_status() { return battery_status; }
+void set_battery_status(avrcp_battery_status_t status) {
+  battery_status = status;
 }

@@ -4,6 +4,7 @@
 #include "a2dp/a2dp_sink.h"
 #include "a2dp/a2dp_cover_art.h"
 #include "avrcp/avrcp.h"
+#include "classic/avrcp.h"
 #include "hci/hci.h"
 
 #ifdef HAVE_BTSTACK_STDIN
@@ -77,6 +78,8 @@ static void stdin_process(char cmd){
     a2dp_sink_demo_a2dp_connection_t *  a2dp_connection  = get_a2dp_connection();
     a2dp_sink_demo_avrcp_connection_t * avrcp_connection = get_avrcp_connection();
 
+    int volume_percent = get_volume_percent();
+    avrcp_battery_status_t battery_status = get_battery_status();
     switch (cmd){
         case 'b':
             status = a2dp_sink_establish_stream(*get_device_addr(), &a2dp_connection->a2dp_cid);
@@ -105,27 +108,33 @@ static void stdin_process(char cmd){
             break;
         // Volume Control
         case 't':
-            volume_percentage = volume_percentage <= 90 ? volume_percentage + 10 : 100;
-            volume = volume_percentage * 127 / 100;
-            printf(" - volume up   for 10 percent, %d%% (%d) \n", volume_percentage, volume);
+            volume_percent = get_volume_percent();
+            set_volume_percent(volume_percent <= 90 ? volume_percent + 10 : 100);
+            volume_percent = get_volume_percent();
+            volume = volume_percent * 127 / 100;
+            printf(" - volume up   for 10 percent, %d%% (%d) \n", volume_percent, volume);
             status = avrcp_target_volume_changed(avrcp_connection->avrcp_cid, volume);
             avrcp_volume_changed(volume);
             break;
         case 'T':
-            volume_percentage = volume_percentage >= 10 ? volume_percentage - 10 : 0;
-            volume = volume_percentage * 127 / 100;
-            printf(" - volume down for 10 percent, %d%% (%d) \n", volume_percentage, volume);
+            volume_percent = get_volume_percent();
+            set_volume_percent(volume_percent >= 10 ? volume_percent - 10 : 0);
+            volume_percent = get_volume_percent();
+            volume = volume_percent * 127 / 100;
+            printf(" - volume down for 10 percent, %d%% (%d) \n", volume_percent, volume);
             status = avrcp_target_volume_changed(avrcp_connection->avrcp_cid, volume);
             avrcp_volume_changed(volume);
             break;
         case 'V':
+            battery_status = get_battery_status();
             old_battery_status = battery_status;
 
             if (battery_status < AVRCP_BATTERY_STATUS_FULL_CHARGE){
-                battery_status = (avrcp_battery_status_t)((uint8_t) battery_status + 1);
+                set_battery_status((avrcp_battery_status_t)((uint8_t) battery_status + 1));
             } else {
-                battery_status = AVRCP_BATTERY_STATUS_NORMAL;
+                set_battery_status(AVRCP_BATTERY_STATUS_NORMAL);
             }
+            battery_status = get_battery_status();
             printf(" - toggle battery value, old %d, new %d\n", old_battery_status, battery_status);
             status = avrcp_target_battery_status_changed(avrcp_connection->avrcp_cid, battery_status);
             break;
