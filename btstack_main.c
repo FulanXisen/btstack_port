@@ -319,7 +319,7 @@ static void stdin_process(char cmd) {
 }
 #endif
 
-int btstack_setup() {
+int btstack_init() {
   // init protocols
   l2cap_init();
   sdp_init();
@@ -482,7 +482,7 @@ int btstack_main(int argc, const char* argv[]) {
   printf("HAVE_POSIX_FILE_IO\n");
 #endif
 
-  btstack_setup();
+  btstack_init();
 
 #ifdef HAVE_BTSTACK_STDIN
   // parse human-readable Bluetooth address

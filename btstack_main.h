@@ -3,6 +3,7 @@
 
 #include "btstack.h"
 
+int btstack_init();
 int btstack_main(int argc, const char* argv[]);
 
 #endif
