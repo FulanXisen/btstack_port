@@ -24,9 +24,11 @@ const char *get_device_addr_string();
 bd_addr_t *get_device_addr();
 #endif
 
-a2dp_sink_demo_stream_endpoint_t a2dp_sink_demo_stream_endpoint;
-a2dp_sink_demo_a2dp_connection_t a2dp_sink_demo_a2dp_connection;
-a2dp_sink_demo_avrcp_connection_t a2dp_sink_demo_avrcp_connection;
+a2dp_sink_demo_stream_endpoint_t *get_stream_endpoint();
+a2dp_sink_demo_a2dp_connection_t *get_a2dp_connection();
+a2dp_sink_demo_avrcp_connection_t *get_avrcp_connection();
+
+
 // sink state
 int volume_percentage = 0;
 avrcp_battery_status_t battery_status = AVRCP_BATTERY_STATUS_WARNING;

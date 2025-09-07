@@ -53,7 +53,7 @@ static void show_usage(void){
     printf("d - connect to addr %s\n", bd_addr_to_str(*get_device_addr()));
     printf("D - disconnect\n");
     if (a2dp_sink_demo_cover_art_client_connected == false){
-        if (a2dp_sink_demo_avrcp_connection.avrcp_cid == 0){
+        if (get_avrcp_connection()->avrcp_cid == 0){
             printf("Not connected, press 'b' or 'c' to first connect AVRCP, then press 'd' to connect cover art client\n");
         } else {
             printf("Not connected, press 'd' to connect cover art client\n");
@@ -74,8 +74,8 @@ static void stdin_process(char cmd){
     uint8_t volume;
     avrcp_battery_status_t old_battery_status;
 
-    a2dp_sink_demo_a2dp_connection_t *  a2dp_connection  = &a2dp_sink_demo_a2dp_connection;
-    a2dp_sink_demo_avrcp_connection_t * avrcp_connection = &a2dp_sink_demo_avrcp_connection;
+    a2dp_sink_demo_a2dp_connection_t *  a2dp_connection  = get_a2dp_connection();
+    a2dp_sink_demo_avrcp_connection_t * avrcp_connection = get_avrcp_connection();
 
     switch (cmd){
         case 'b':
@@ -281,7 +281,7 @@ int btstack_setup(){
     // Configure A2DP Sink
     a2dp_sink_register_packet_handler(&a2dp_sink_packet_handler);
     a2dp_sink_register_media_handler(&handle_l2cap_media_data_packet);
-    a2dp_sink_demo_stream_endpoint_t * stream_endpoint = &a2dp_sink_demo_stream_endpoint;
+    a2dp_sink_demo_stream_endpoint_t * stream_endpoint = get_stream_endpoint();
     avdtp_stream_endpoint_t * local_stream_endpoint = a2dp_sink_create_stream_endpoint(AVDTP_AUDIO,
                                                                                        AVDTP_CODEC_SBC, media_sbc_codec_capabilities, sizeof(media_sbc_codec_capabilities),
                                                                                        stream_endpoint->media_sbc_codec_configuration, sizeof(stream_endpoint->media_sbc_codec_configuration));

@@ -99,7 +99,7 @@ void a2dp_sink_packet_handler(uint8_t packet_type, uint16_t channel,
   if (hci_event_packet_get_type(packet) != HCI_EVENT_A2DP_META)
     return;
 
-  a2dp_sink_demo_a2dp_connection_t *a2dp_conn = &a2dp_sink_demo_a2dp_connection;
+  a2dp_sink_demo_a2dp_connection_t *a2dp_conn = get_a2dp_connection();
 
   switch (packet[2]) {
   case A2DP_SUBEVENT_SIGNALING_MEDIA_CODEC_OTHER_CONFIGURATION:
@@ -278,7 +278,7 @@ void handle_l2cap_media_data_packet(uint8_t seid, uint8_t *packet,
     l2cap_stream_started = 1;
     btstack_sample_rate_compensation_init(
         &sample_rate_compensation, btstack_run_loop_get_time_ms(),
-        a2dp_sink_demo_a2dp_connection.sbc_configuration.sampling_frequency,
+        get_a2dp_connection()->sbc_configuration.sampling_frequency,
         FLOAT_TO_Q15(1.f));
   }
   // update sample rate compensation

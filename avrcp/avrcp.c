@@ -14,8 +14,7 @@ void avrcp_packet_handler(uint8_t packet_type, uint16_t channel,
   uint8_t status;
   bd_addr_t address;
 
-  a2dp_sink_demo_avrcp_connection_t *connection =
-      &a2dp_sink_demo_avrcp_connection;
+  a2dp_sink_demo_avrcp_connection_t *connection = get_avrcp_connection();
 
   if (packet_type != HCI_EVENT_PACKET)
     return;
@@ -74,8 +73,7 @@ void avrcp_controller_packet_handler(uint8_t packet_type, uint16_t channel,
   uint8_t play_status;
   uint8_t event_id;
 
-  a2dp_sink_demo_avrcp_connection_t *avrcp_connection =
-      &a2dp_sink_demo_avrcp_connection;
+  a2dp_sink_demo_avrcp_connection_t *avrcp_connection = get_avrcp_connection();
 
   if (packet_type != HCI_EVENT_PACKET)
     return;
@@ -117,7 +115,7 @@ void avrcp_controller_packet_handler(uint8_t packet_type, uint16_t channel,
 #ifdef ENABLE_AVRCP_COVER_ART
     // image handles become invalid on player change, registe for notifications
     avrcp_controller_enable_notification(
-        a2dp_sink_demo_avrcp_connection.avrcp_cid,
+        avrcp_connection->avrcp_cid,
         AVRCP_NOTIFICATION_EVENT_UIDS_CHANGED);
     // trigger cover art client connection
     a2dp_sink_demo_cover_art_connect();
