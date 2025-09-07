@@ -233,7 +233,6 @@ set(SOURCES_BTSTACK
     ${SOURCES_ZEPHYR}
 )
 list(SORT SOURCES_BTSTACK)
-message("SOURCES_BTSTACK: ${SOURCES_BTSTACK}")
 # 生成BTStack静态库（先编译库再链接，与官方保持一致）
 add_library(btstack STATIC ${SOURCES_BTSTACK})
 
